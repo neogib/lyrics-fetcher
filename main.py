@@ -6,7 +6,6 @@ from mutagen.oggopus import OggOpus
 
 def lyrics_for_songs_from_directory(directory_path: str):
     path = Path(directory_path)
-    print(path)
 
     for file_path in path.glob("*.opus"):
         audio: OggOpus = OggOpus(file_path)
@@ -21,7 +20,6 @@ def lyrics_for_songs_from_directory(directory_path: str):
             continue
 
         duration = audio.info.length
-        print(duration)
         print(
             f"Title: {title}, Artist: {artist}, Album: {album}, Duration: {duration:.2f} seconds"
         )
@@ -43,7 +41,13 @@ def lyrics_for_songs_from_directory(directory_path: str):
             print("No synced lyrics found.")
             continue
         with open(file_path.with_suffix(".lrc"), "w", encoding="utf-8") as lrc_file:
-            metadata = f"[ti:{title}]\n[ar:{artist}]\n[al:{album}]\n\n"
+            minutes = int(duration // 60)
+            secs = int(duration % 60)
+            cent = int((duration - int(duration)) * 100)  # hundredths
+            time_format = f"{minutes:02d}:{secs:02d}:{cent:02d}"
+            metadata = (
+                f"[ti:{title}]\n[ar:{artist}]\n[al:{album}]\n[length:{time_format}]\n\n"
+            )
 
             lrc_file.write(metadata)
 
