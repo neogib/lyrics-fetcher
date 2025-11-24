@@ -1,7 +1,18 @@
 from pathlib import Path, PosixPath
-
+import logging
 import requests
 from mutagen.oggopus import OggOpus
+
+
+def setup_logging():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler("download_lyrics.log"),
+            logging.StreamHandler(),
+        ],
+    )
 
 
 def lyrics_for_songs_from_directory(directory_path: str):
@@ -14,13 +25,13 @@ def lyrics_for_songs_from_directory(directory_path: str):
         artist = tags.get("artist", [""])[0]
         album = tags.get("album", [""])[0]
         if not all([title, artist, album]):
-            print(
+            logging.warning(
                 f"Some tags are missing, skipping this song: {title} - {artist} - {album}"
             )
             continue
 
         duration = audio.info.length
-        print(
+        logging.info(
             f"Title: {title}, Artist: {artist}, Album: {album}, Duration: {duration:.2f} seconds"
         )
 
@@ -33,12 +44,12 @@ def lyrics_for_songs_from_directory(directory_path: str):
         base_url = "https://lrclib.net/api"
         response = requests.get(f"{base_url}/get", params=query_params)
         if response.status_code != 200:
-            print(f"Error fetching lyrics: {response.status_code}")
+            logging.error(f"Error fetching lyrics: {response.status_code}")
             continue
         data = response.json()
         synced_lyrics = data.get("syncedLyrics", [])
         if not synced_lyrics:
-            print("No synced lyrics found.")
+            logging.info("No synced lyrics found.")
             continue
         with open(file_path.with_suffix(".lrc"), "w", encoding="utf-8") as lrc_file:
             minutes = int(duration // 60)
@@ -55,6 +66,7 @@ def lyrics_for_songs_from_directory(directory_path: str):
 
 
 def main():
+    setup_logging()
     full_path = f"{Path.home()}/Music/4now"
     lyrics_for_songs_from_directory(full_path)
 
