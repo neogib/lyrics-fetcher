@@ -1,5 +1,6 @@
 import argparse
 import logging
+from typing import cast
 
 from lyrics_downloader import LyricsDownloader
 
@@ -18,7 +19,7 @@ def setup_logging():
 def main():
     setup_logging()
     parser = argparse.ArgumentParser(description="Download lyrics for opus files.")
-    parser.add_argument(
+    _ = parser.add_argument(
         "paths",
         nargs="+",
         help="List of files or directories to process",
@@ -26,7 +27,7 @@ def main():
     args = parser.parse_args()
 
     downloader = LyricsDownloader()
-    downloader.run(args.paths)
+    downloader.run(cast(list[str], args.paths))
 
 
 if __name__ == "__main__":
