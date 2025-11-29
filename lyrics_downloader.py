@@ -29,6 +29,7 @@ class LyricsDownloader:
         logger.info(f"Processed {self.proccessed_songs} songs.")
 
     def process_song(self, file_path: Path):
+        logger.info(f"Processing file: {file_path}")
         try:
             audio = TinyTag.get(file_path)
         except Exception as e:
@@ -39,15 +40,12 @@ class LyricsDownloader:
         album = audio.album
         title = audio.title
         duration = audio.duration
+
         if title is None or artist is None or album is None or duration is None:
             logger.warning(
-                f"Some tags are missing, skipping this song: {title} - {artist} - {album} ({file_path.name})"
+                f"Some tags are missing, skipping this song: title: {title}, artist: {artist}, album: {album}, duration: {duration} ({file_path.name})"
             )
             return
-
-        logger.info(
-            f"Title: {title}, Artist: {artist}, Album: {album}, Duration: {duration:.2f} seconds"
-        )
 
         synced_lyrics = self.fetch_lyrics(title, artist, album, duration)
         if synced_lyrics:

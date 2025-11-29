@@ -2,6 +2,8 @@ import argparse
 import logging
 from typing import cast
 
+from rich.logging import RichHandler
+
 from lyrics_downloader import LyricsDownloader
 
 
@@ -11,7 +13,7 @@ def setup_logging():
         format="%(asctime)s - %(name)s -  %(levelname)s - %(message)s",
         handlers=[
             logging.FileHandler("download_lyrics.log"),
-            logging.StreamHandler(),
+            RichHandler(rich_tracebacks=True),
         ],
     )
 
